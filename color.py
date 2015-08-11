@@ -522,7 +522,7 @@ class Frame:
 
 if __name__ == '__main__':
     N = 10000000
-    H, W = 270, 480
+    H, W = 50, 480
 
     x = np.random.randn(N) * W / 4 + W / 2 - 0.5
     y = np.random.randn(N) * H / 4 + H / 2 - 0.5
