@@ -1,0 +1,2 @@
+#!/bin/bash
+mencoder mf://*.png -mf w=240:h=135:fps=10:type=png -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o lorenz.avi
