@@ -481,6 +481,14 @@ _xyz2rgb = np.array([[ 2.0413690, -0.5649464, -0.3446944],
                      [ 0.0134474, -0.1183897,  1.0154096]])
 
 _CIEXYZ_1931_table_rgb = np.dot(_CIEXYZ_1931_table[:,1:], _xyz2rgb)
+_CIEXYZ_1931_table_wl = _CIEXYZ_1931_table[:,0]
+
+def CIEXYZ_1931_table_rgb(wl):
+    rgb = np.empty([wl.shape[0], 3])
+    rgb[:,0] = np.interp(wl, _CIEXYZ_1931_table_wl, _CIEXYZ_1931_table_rgb[:,0])
+    rgb[:,1] = np.interp(wl, _CIEXYZ_1931_table_wl, _CIEXYZ_1931_table_rgb[:,1])
+    rgb[:,2] = np.interp(wl, _CIEXYZ_1931_table_wl, _CIEXYZ_1931_table_rgb[:,2])
+    return rgb
 
 class Frame:
     def __init__(self, filename, shape):
@@ -503,12 +511,26 @@ class Frame:
             self.rgb = np.zeros((self.ny * self.nx, 3), dtype=np.float32)
 
     def accumulate(self, x, y, wavelength):
-        sel = reduce(np.logical_and, (x >= 0, x < self.nx, y >= 0, y < self.ny,
-                                      wavelength >= _CIEXYZ_1931_table[0,0],
-                                      wavelength <= _CIEXYZ_1931_table[-1,0]))
-        x, y, wavelength = x[sel], y[sel], wavelength[sel]
+        x_int, y_int = np.array(np.round(x), int), np.array(np.round(y), int)
+        rgb = CIEXYZ_1931_table_rgb(wavelength)
+
+        dx_int = np.array([-2,-1,-1,-1,0,0,0,0,0,1,1,1,2])
+        dy_int = np.array([0,-1,-0,1,-2,-1,0,1,2,-1,0,1,0])
+        x_int = x_int[:,np.newaxis] + dx_int
+        y_int = y_int[:,np.newaxis] + dy_int
+
+        dx, dy = x_int - x[:,np.newaxis], y_int - y[:,np.newaxis]
+        w = np.exp(-(dx**2 + dy**2))
+        w /= w.sum(1)[:,np.newaxis]
+        rgb = rgb[:,np.newaxis,:] * w[:,:,np.newaxis]
+
+        x, y = np.ravel(x_int), np.ravel(y_int)
+        rgb = rgb.reshape([x.size, 3])
+
+        sel = reduce(np.logical_and, (x >= 0, x < self.nx, y >= 0, y < self.ny))
+        x, y, rgb = x[sel], y[sel], rgb[sel]
+
         i = y * self.nx + x
-        rgb = _CIEXYZ_1931_table_rgb[wavelength - 360, :]
         np.add.at(self.rgb, i, rgb)
 
     def close(self):
@@ -521,20 +543,19 @@ class Frame:
         exr.writePixels({'R': r, 'G': g, 'B': b})
 
 if __name__ == '__main__':
-    N = 10000000
+    N = 100000
     H, W = 50, 480
 
-    x = np.random.randn(N) * W / 4 + W / 2 - 0.5
-    y = np.random.randn(N) * H / 4 + H / 2 - 0.5
     r = np.random.rand(N)
+    x = r * W
+    y = np.random.randn(N) * H / 8 + H / 2 - 0.5
 
-    x += (r - 0.5) * W
-    w = r * _CIEXYZ_1931_table.shape[0] + _CIEXYZ_1931_table[0,0]
+    w = r * _CIEXYZ_1931_table_wl.size + _CIEXYZ_1931_table_wl[0]
 
-    x = np.array(np.round(x), int)
-    y = np.array(np.round(y), int)
-    w = np.array(w, int)
-
-    f = Frame('test.exr', (W, H))
+    f = Frame('test_raw.exr', (W, H))
     f.accumulate(x, y, w)
     f.close()
+
+    os.system('exrnormalize test_raw.exr test.exr 0.8')
+    os.system('exrtopng test.exr test.png')
+
