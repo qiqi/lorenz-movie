@@ -44,5 +44,5 @@ for iFrame in range(1, 60 * 60 * 5):
         f2 = lorenz(xyz + 0.5 * f1, r) * dt
         f3 = lorenz(xyz + f2, r) * dt
         xyz += (f0 + f3) / 6 + (f1 + f2) / 3
-        plot(iFrame, xyz[0], xyz[2], r)
+    plot(iFrame, xyz[0], xyz[2], r)
 
