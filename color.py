@@ -533,13 +533,16 @@ class Frame:
         i = y * self.nx + x
         np.add.at(self.rgb, i, rgb)
 
-    def close(self):
+    def write(self, fname=None):
+        if fname is None:
+            fname = self.filename
+
         r = array.array('f', np.ravel(self.rgb[:,0])).tostring()
         g = array.array('f', np.ravel(self.rgb[:,1])).tostring()
         b = array.array('f', np.ravel(self.rgb[:,2])).tostring()
 
         exrHeader = OpenEXR.Header(self.nx, self.ny)
-        exr = OpenEXR.OutputFile(self.filename, exrHeader)
+        exr = OpenEXR.OutputFile(fname, exrHeader)
         exr.writePixels({'R': r, 'G': g, 'B': b})
 
 if __name__ == '__main__':
@@ -554,7 +557,7 @@ if __name__ == '__main__':
 
     f = Frame('test_raw.exr', (W, H))
     f.accumulate(x, y, w)
-    f.close()
+    f.write()
 
     os.system('exrnormalize test_raw.exr test.exr 0.8')
     os.system('exrtopng test.exr test.png')

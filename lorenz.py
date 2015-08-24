@@ -22,17 +22,17 @@ def plot(i, x, y, r):
 
     f = Frame(filename + '_raw.exr', (W, H))
     f.accumulate(x, y, wavelength)
-    f.close()
+    f.write()
 
     # os.system('exrnormalize {0}_raw.exr {0}.exr 1'.format(filename))
     os.system('exrtopng {0}_raw.exr {0}.png &'.format(filename))
 
 dt = 1. / 4 / 60
-N = 1000000
+N = 500000
 x = ones(N)
 y = ones(N)
 z = ones(N) + 28
-r = linspace(27, 29, N)
+r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
 
 xyz = array([x, y, z], float)
 
