@@ -27,22 +27,26 @@ def plot(i, x, y, r):
     # os.system('exrnormalize {0}_raw.exr {0}.exr 1'.format(filename))
     os.system('exrtopng {0}_raw.exr {0}.png &'.format(filename))
 
-dt = 1. / 4 / 60
-N = 500000
-x = ones(N)
-y = ones(N)
-z = ones(N) + 28
-r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
+for i_repeat in range(2000):
+    print('REPETATION ', i_repeat)
+    sys.stdout.flush()
 
-xyz = array([x, y, z], float)
-
-plot(0, xyz[0], xyz[2], r)
-for iFrame in range(1, 60 * 60 * 5):
-    for iStep in range(2):
-        f0 = lorenz(xyz, r) * dt
-        f1 = lorenz(xyz + 0.5 * f0, r) * dt
-        f2 = lorenz(xyz + 0.5 * f1, r) * dt
-        f3 = lorenz(xyz + f2, r) * dt
-        xyz += (f0 + f3) / 6 + (f1 + f2) / 3
-    plot(iFrame, xyz[0], xyz[2], r)
+    dt = 1. / 4 / 60
+    N = 500000
+    x = ones(N)
+    y = ones(N)
+    z = ones(N) + 28
+    r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
+    
+    xyz = array([x, y, z], float)
+    
+    plot(0, xyz[0], xyz[2], r)
+    for iFrame in range(1, 60 * 60 * 5):
+        for iStep in range(2):
+            f0 = lorenz(xyz, r) * dt
+            f1 = lorenz(xyz + 0.5 * f0, r) * dt
+            f2 = lorenz(xyz + 0.5 * f1, r) * dt
+            f3 = lorenz(xyz + f2, r) * dt
+            xyz += (f0 + f3) / 6 + (f1 + f2) / 3
+        plot(iFrame, xyz[0] * 1.8, xyz[2], r)
 
