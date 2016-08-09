@@ -2,6 +2,11 @@ import os, sys
 from color import Frame
 from numpy import *
 
+if len(sys.argv) > 1:
+    prefix = 'fname_' + sys.argv[1]
+else:
+    prefix = 'fname'
+
 def lorenz(xyz, r):
     x, y, z = xyz
     sigma, beta = 10., 8./3
@@ -11,7 +16,7 @@ def lorenz(xyz, r):
     return array([dxdt, dydt, dzdt])
 
 def plot(i, x, y, r):
-    filename = 'frame{0:06d}'.format(i)
+    filename = '{0}_{1:06d}'.format(prefix, i)
     # W, H = 1920 / 8, 1080 / 8
     W, H = 1920, 1080
     y0, y1 = 0, 55
