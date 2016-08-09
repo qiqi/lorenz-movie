@@ -3,9 +3,9 @@ from color import Frame
 from numpy import *
 
 if len(sys.argv) > 1:
-    prefix = 'fname_' + sys.argv[1]
+    prefix = 'frame_' + sys.argv[1]
 else:
-    prefix = 'fname'
+    prefix = 'frame'
 
 def lorenz(xyz, r):
     x, y, z = xyz
