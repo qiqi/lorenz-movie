@@ -1,11 +1,14 @@
-import os, sys
+import os, sys, time
 from color import Frame
 from numpy import *
+from mpi4py import MPI
 
 if len(sys.argv) > 1:
     prefix = 'frame_' + sys.argv[1]
 else:
     prefix = 'frame'
+
+comm = MPI.COMM_WORLD
 
 def lorenz(xyz, r):
     x, y, z = xyz
@@ -27,12 +30,13 @@ def plot(i, x, y, r):
 
     f = Frame(filename + '_raw.exr', (W, H))
     f.accumulate(x, y, wavelength)
-    f.write()
-    f.write_png()
+    return f
 
 for i_repeat in range(2000):
-    print('REPETATION ', i_repeat)
-    sys.stdout.flush()
+    comm.Barrier()
+    if comm.rank == 0:
+        print('REPETATION ', i_repeat)
+        sys.stdout.flush()
 
     dt = 1. / 4 / 60
     N = 500000
@@ -43,13 +47,25 @@ for i_repeat in range(2000):
 
     xyz = array([x, y, z], float)
 
-    plot(0, xyz[0] * 1.8, xyz[2], r)
     for iFrame in range(1, 60 * 60 * 5):
-        for iStep in range(1):
+        t0 = time.time()
+        for iStep in range(2):
             f0 = lorenz(xyz, r) * dt
             f1 = lorenz(xyz + 0.5 * f0, r) * dt
             f2 = lorenz(xyz + 0.5 * f1, r) * dt
             f3 = lorenz(xyz + f2, r) * dt
             xyz += (f0 + f3) / 6 + (f1 + f2) / 3
-        plot(iFrame, xyz[0] * 1.8, xyz[2], r)
-
+        t1 = time.time()
+        f = plot(iFrame, xyz[0] * 1.8, xyz[2], r)
+        t2 = time.time()
+        cumm_rgb = zeros_like(f.rgb)
+        comm.Reduce(f.rgb, cumm_rgb, op=MPI.SUM, root=0)
+        t3 = time.time()
+        if comm.rank == 0:
+            f.rgb = cumm_rgb
+            f.write()
+            f.write_png()
+        t4 = time.time()
+        if comm.rank == 0:
+            print('Time {0} {1} {2} {3}'.format(t1-t0, t2-t1, t3-t2, t4-t3))
+            sys.stdout.flush()
