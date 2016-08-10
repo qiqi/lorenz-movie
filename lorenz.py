@@ -1,24 +1,31 @@
+from __future__ import division
+
 import os, sys, time
 from color import Frame
 from numpy import *
 from mpi4py import MPI
 
-if len(sys.argv) > 1:
-    prefix = 'frame_' + sys.argv[1]
-else:
-    prefix = 'frame'
+sys.path.append('/home/qiqi/git/lssode')
+from lssode import *
 
 comm = MPI.COMM_WORLD
 
-def lorenz(xyz, r):
-    x, y, z = xyz
-    sigma, beta = 10., 8./3
-    dxdt = sigma * (y - x)
-    dydt = (x * (r - z) - y)
-    dzdt = (x * y - beta * z)
-    return array([dxdt, dydt, dzdt])
+# def lorenz(xyz, r):
+#     x, y, z = xyz
+#     sigma, beta = 10., 8./3
+#     dxdt = sigma * (y - x)
+#     dydt = (x * (r - z) - y)
+#     dzdt = (x * y - beta * z)
+#     return array([dxdt, dydt, dzdt])
+def lorenz(u, rho):
+    shp = u.shape
+    x, y, z = u.reshape([-1, 3]).T
+    sigma, beta = 10, 8./3
+    dxdt, dydt, dzdt = sigma*(y-x), x*(rho-z)-y, x*y - beta*z
+    return transpose([dxdt, dydt, dzdt]).reshape(shp)
 
-def plot(i, x, y, r):
+
+def plot(i, x, y, r, prefix='frame'):
     filename = '{0}_{1:06d}'.format(prefix, i)
     # W, H = 1920 / 8, 1080 / 8
     W, H = 1920, 1080
@@ -32,12 +39,30 @@ def plot(i, x, y, r):
     f.accumulate(x, y, wavelength)
     return f
 
-for i_repeat in range(2000):
-    comm.Barrier()
-    if comm.rank == 0:
-        print('REPETATION ', i_repeat)
-        sys.stdout.flush()
-
+if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
+    N = 21
+    r = linspace(27, 29, N)
+    xyz0 = array([1,1,28])
+    dt = 1. / 2 / 60
+    t = dt * arange(60*60*2)
+    solver = lssSolver(lorenz, xyz0, r[(N-1)//2], t)
+    u = [solver.u.copy()]
+    for rho in r[(N-1)//2+1:]:
+        print('rho = ', rho)
+        solver.lss(rho)
+        u.append(solver.u.copy())
+    solver = lssSolver(lorenz, xyz0, r[(N-1)//2], t)
+    for rho in reversed(r[:(N-1)//2]):
+        print('rho = ', rho)
+        solver.lss(rho)
+        u.insert(0, solver.u.copy())
+    xyz = array(u)
+    for iFrame in range(xyz.shape[1]):
+        f = plot(iFrame, xyz[:,iFrame,0] * 1.8, xyz[:,iFrame,2], r,
+                 prefix='shadowing')
+        f.write()
+        f.write_png()
+else:
     dt = 1. / 4 / 60
     N = 500000
     x = ones(N)
@@ -45,9 +70,9 @@ for i_repeat in range(2000):
     z = ones(N) + 28
     r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
 
-    xyz = array([x, y, z], float)
+    xyz = array([x, y, z], float).T
 
-    for iFrame in range(1, 60 * 60 * 5):
+    for iFrame in range(1, 60 * 60 * 2):
         t0 = time.time()
         for iStep in range(2):
             f0 = lorenz(xyz, r) * dt
@@ -56,7 +81,7 @@ for i_repeat in range(2000):
             f3 = lorenz(xyz + f2, r) * dt
             xyz += (f0 + f3) / 6 + (f1 + f2) / 3
         t1 = time.time()
-        f = plot(iFrame, xyz[0] * 1.8, xyz[2], r)
+        f = plot(iFrame, xyz[:,0] * 1.8, xyz[:,2], r)
         t2 = time.time()
         cumm_rgb = zeros_like(f.rgb)
         comm.Reduce(f.rgb, cumm_rgb, op=MPI.SUM, root=0)

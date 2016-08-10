@@ -1,2 +1,2 @@
 #!/bin/bash
-mencoder mf://*.png -mf w=1920:h=1080:fps=60:type=png -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o lorenz_fast.avi
+mencoder mf://*.png -mf w=1920:h=1080:fps=30:type=png -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o lorenz_fast.avi
