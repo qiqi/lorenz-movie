@@ -1,0 +1,6 @@
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_000510_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_000510_raw.png)
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_000750_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_000750_raw.png)
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_001100_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_001100_raw.png)
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_001500_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_001500_raw.png)
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_002000_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_002000_raw.png)
+![[t=4.25](http://qiqi.github.io/lorenz-movie/noshadow/frame_004000_raw.png)](http://qiqi.github.io/lorenz-movie/noshadow/frame_004000_raw.png)
