@@ -65,7 +65,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
 else:
     dt = 1. / 4 / 60
     N = 500000
-    x = ones(N)
+    x = ones(N) + 1
     y = ones(N)
     z = ones(N) + 28
     r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
