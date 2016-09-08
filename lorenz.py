@@ -5,7 +5,8 @@ from color import Frame
 from numpy import *
 from mpi4py import MPI
 
-sys.path.append('/home/qiqi/git/lssode')
+sys.path.append('/master/home/niangxiu/lssode')
+#sys.path.append('/home/niangxiu/Working/lssode')
 from lssode import *
 
 comm = MPI.COMM_WORLD
@@ -33,7 +34,7 @@ def plot(i, x, y, r, prefix='frame'):
 
     y = H * (y1 - y) / (y1 - y0)
     x = H * x / (y1 - y0) + W / 2
-    wavelength = (r - r[0]) / (r[-1] - r[0]) * (830 - 360) + 360
+    wavelength = ones(x.shape) * 1.0 / 2 * (830 - 360) + 360
 
     f = Frame(filename + '_raw.exr', (W, H))
     f.accumulate(x, y, wavelength)
@@ -65,13 +66,19 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
 else:
     dt = 1. / 4 / 60
     N = 500000
-    x = ones(N) + 1
+    x = ones(N) + (random.rand(N) * 2 -1)
+    y = ones(N) + (random.rand(N) * 2 -1)
+    z = ones(N) + 28 + (random.rand(N) * 2 -1)
+    r = 28.00 * ones(N) 
+    #print(x.shape, y.shape, z.shape, r.shape)
+    
+    x = ones(N) 
     y = ones(N)
-    z = ones(N) + 28
+    z = ones(N) + 28 
     r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
+    #print(x.shape, y.shape, z.shape, r.shape)
 
     xyz = array([x, y, z], float).T
-
     for iFrame in range(1, 60 * 60 * 2):
         t0 = time.time()
         for iStep in range(2):
@@ -92,5 +99,5 @@ else:
             f.write_png()
         t4 = time.time()
         if comm.rank == 0:
-            print('Time {0} {1} {2} {3}'.format(t1-t0, t2-t1, t3-t2, t4-t3))
+            print('Time {0} {1} {2} {3} {4}'.format(iFrame, t1-t0, t2-t1, t3-t2, t4-t3))
             sys.stdout.flush()

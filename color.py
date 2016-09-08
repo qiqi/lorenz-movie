@@ -1,6 +1,7 @@
 import os
 import numpy as np
-import OpenEXR, array, Imath, Image
+import OpenEXR, array, Imath
+from PIL import Image
 
 _CIEXYZ_1931_table_rgb = np.array([
     [360, 0.0   , 0.0   , 0.0   ],
