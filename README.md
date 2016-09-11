@@ -1,3 +1,6 @@
+This branch simulates different trajectories using different initial condition but under same governing equation.
+Below are snapshots of states of all trajectories at 6 different time points.
+
 ![var_u0_frame_000520_raw](https://cloud.githubusercontent.com/assets/8681606/18417183/cb4857c0-77f6-11e6-9c65-06faae9b0ef5.png)
 ![var_u0_frame_000750_raw](https://cloud.githubusercontent.com/assets/8681606/18417180/cb46f006-77f6-11e6-834e-c3d9cc0abf7e.png)
 ![var_u0_frame_001100_raw](https://cloud.githubusercontent.com/assets/8681606/18417181/cb47030c-77f6-11e6-8e9d-745b1a6430e7.png)
