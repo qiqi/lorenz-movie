@@ -1,0 +1,5 @@
+*.exr
+*.png
+*.pyc
+*.err
+*.out

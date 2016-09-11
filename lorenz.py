@@ -6,25 +6,16 @@ from numpy import *
 from mpi4py import MPI
 
 sys.path.append('/master/home/niangxiu/lssode')
-#sys.path.append('/home/niangxiu/Working/lssode')
 from lssode import *
 
 comm = MPI.COMM_WORLD
 
-# def lorenz(xyz, r):
-#     x, y, z = xyz
-#     sigma, beta = 10., 8./3
-#     dxdt = sigma * (y - x)
-#     dydt = (x * (r - z) - y)
-#     dzdt = (x * y - beta * z)
-#     return array([dxdt, dydt, dzdt])
 def lorenz(u, rho):
     shp = u.shape
     x, y, z = u.reshape([-1, 3]).T
     sigma, beta = 10, 8./3
     dxdt, dydt, dzdt = sigma*(y-x), x*(rho-z)-y, x*y - beta*z
     return transpose([dxdt, dydt, dzdt]).reshape(shp)
-
 
 def plot(i, x, y, r, prefix='frame'):
     filename = '{0}_{1:06d}'.format(prefix, i)
@@ -70,13 +61,11 @@ else:
     y = ones(N) + (random.rand(N) * 2 -1)
     z = ones(N) + 28 + (random.rand(N) * 2 -1)
     r = 28.00 * ones(N) 
-    #print(x.shape, y.shape, z.shape, r.shape)
     
     x = ones(N) 
     y = ones(N)
     z = ones(N) + 28 
     r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
-    #print(x.shape, y.shape, z.shape, r.shape)
 
     xyz = array([x, y, z], float).T
     for iFrame in range(1, 60 * 60 * 2):
