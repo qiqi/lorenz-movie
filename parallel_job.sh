@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=lorenzMovie
-#SBATCH --workdir=/master/home/niangxiu/lorenz-movie
+#SBATCH --job-name=lorenzMovie-var-u0
+#SBATCH --workdir=/master/home/niangxiu/lorenz-movie-var-u0/
 #SBATCH --output=out.out
 #SBATCH --error=err.err
-#SBATCH --nodes=18
+#SBATCH --nodes=9
 #SBATCH --ntasks-per-node=4
  
 source /etc/profile.d/master-bin.sh

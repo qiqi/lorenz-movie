@@ -57,17 +57,21 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
 else:
     dt = 1. / 4 / 60
     N = 500000
-    x = ones(N) + (random.rand(N) * 2 -1)
-    y = ones(N) + (random.rand(N) * 2 -1)
-    z = ones(N) + 28 + (random.rand(N) * 2 -1)
+    dx = ones(N)
+    dy = ones(N)
+    dz = ones(N)
+    for i in range (0,N):
+        while (dx[i]**2 + dy[i]**2 + dz[i]**2 > 1):
+            dx[i] = random.rand(1) * 2 - 1
+            dy[i] = random.rand(1) * 2 - 1
+            dz[i] = random.rand(1) * 2 - 1
+    x = 1.0379*ones(N) + dx
+    y = 1.8265*ones(N) + dy
+    z = 13.5089*ones(N) + dz
     r = 28.00 * ones(N) 
-    
-    x = ones(N) 
-    y = ones(N)
-    z = ones(N) + 28 
-    r = linspace(27, 29, N) + (random.rand(N) * 2 - 1) / N
 
     xyz = array([x, y, z], float).T
+
     for iFrame in range(1, 60 * 60 * 2):
         t0 = time.time()
         for iStep in range(2):
