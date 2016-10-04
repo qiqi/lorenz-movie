@@ -5,7 +5,8 @@ from color import Frame
 from numpy import *
 from mpi4py import MPI
 
-sys.path.append('/master/home/niangxiu/lssode')
+#sys.path.append('/master/home/niangxiu/lssode')
+sys.path.append('/home/niangxiu/Working/lssode')
 from lssode import *
 
 comm = MPI.COMM_WORLD
@@ -60,14 +61,13 @@ else:
     dx = ones(N)
     dy = ones(N)
     dz = ones(N)
-    for i in range (0,N):
-        while (dx[i]**2 + dy[i]**2 + dz[i]**2 > 1):
-            dx[i] = random.rand(1) * 2 - 1
-            dy[i] = random.rand(1) * 2 - 1
-            dz[i] = random.rand(1) * 2 - 1
-    x = 1.0379*ones(N) + dx
-    y = 1.8265*ones(N) + dy
-    z = 13.5089*ones(N) + dz
+    xi = random.rand(N) * 2 - 1
+    # data used: 38.98 [-12.27368199 -13.42130455  30.62918149] [-0.14977314 -0.36495871  0.81745418]
+    dx, dy, dz = dot(array([-0.14977314, -0.36495871, 0.81745418])[:,newaxis], xi[newaxis, :])
+    dx, dy, dz = array([dx, dy, dz]) * 1e-3
+    x = -12.27368199 * ones(N) + dx
+    y = -13.42130455 * ones(N) + dy
+    z = 30.62918149 * ones(N) + dz
     r = 28.00 * ones(N) 
 
     xyz = array([x, y, z], float).T
