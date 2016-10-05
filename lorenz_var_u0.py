@@ -26,7 +26,7 @@ def plot(i, x, y, r, prefix='frame'):
 
     y = H * (y1 - y) / (y1 - y0)
     x = H * x / (y1 - y0) + W / 2
-    wavelength = ones(x.shape) * 1.0 / 2 * (830 - 360) + 360
+    wavelength = ones(x.shape) * 1.0 / 2 * (700 - 400) + 400
 
     f = Frame(filename + '_raw.exr', (W, H))
     f.accumulate(x, y, wavelength)
@@ -58,16 +58,17 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
 else:
     dt = 1. / 4 / 60
     N = 500000
+    xi = linspace(-1,1,N) + (random.rand(N) *2 - 1)/N
+    # data used: time: 50.0 xyz:[ 11.99784076   6.82321628  36.46795002 ] 
+    # tan: [ 0.09393647 -0.00105302  1.02519158 ]
     dx = ones(N)
     dy = ones(N)
     dz = ones(N)
-    xi = random.rand(N) * 2 - 1
-    # data used: 38.98 [-12.27368199 -13.42130455  30.62918149] [-0.14977314 -0.36495871  0.81745418]
-    dx, dy, dz = dot(array([-0.14977314, -0.36495871, 0.81745418])[:,newaxis], xi[newaxis, :])
+    dx, dy, dz = dot(array([0.09393647, -0.00105302, 1.02519158])[:,newaxis], xi[newaxis, :])
     dx, dy, dz = array([dx, dy, dz]) * 1e-3
-    x = -12.27368199 * ones(N) + dx
-    y = -13.42130455 * ones(N) + dy
-    z = 30.62918149 * ones(N) + dz
+    x = 11.99784076 * ones(N) + dx
+    y = 6.82321628 * ones(N) + dy
+    z = 36.46795002 * ones(N) + dz
     r = 28.00 * ones(N) 
 
     xyz = array([x, y, z], float).T
@@ -80,17 +81,18 @@ else:
             f2 = lorenz(xyz + 0.5 * f1, r) * dt
             f3 = lorenz(xyz + f2, r) * dt
             xyz += (f0 + f3) / 6 + (f1 + f2) / 3
-        t1 = time.time()
-        f = plot(iFrame, xyz[:,0] * 1.8, xyz[:,2], r)
-        t2 = time.time()
-        cumm_rgb = zeros_like(f.rgb)
-        comm.Reduce(f.rgb, cumm_rgb, op=MPI.SUM, root=0)
-        t3 = time.time()
-        if comm.rank == 0:
-            f.rgb = cumm_rgb
-            f.write()
-            f.write_png()
-        t4 = time.time()
-        if comm.rank == 0:
-            print('Time {0} {1} {2} {3} {4}'.format(iFrame, t1-t0, t2-t1, t3-t2, t4-t3))
-            sys.stdout.flush()
+        if iFrame % 1 == 0: # output interval
+            t1 = time.time()
+            f = plot(iFrame, xyz[:,0] * 1.8, xyz[:,2], r)
+            t2 = time.time()
+            cumm_rgb = zeros_like(f.rgb)
+            comm.Reduce(f.rgb, cumm_rgb, op=MPI.SUM, root=0)
+            t3 = time.time()
+            if comm.rank == 0:
+                f.rgb = cumm_rgb
+                f.write()
+                f.write_png()
+            t4 = time.time()
+            if comm.rank == 0:
+                print('Time {0} {1} {2} {3} {4}'.format(iFrame, t1-t0, t2-t1, t3-t2, t4-t3))
+                sys.stdout.flush()
