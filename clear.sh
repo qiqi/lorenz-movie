@@ -2,3 +2,4 @@
 rm *.png
 rm *.exr
 rm *.pyc
+rm *.*~
