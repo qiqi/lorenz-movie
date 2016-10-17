@@ -57,7 +57,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
         f.write_png()
 else:
     dt = 1. / 4 / 60
-    N = 500000
+    N = 500000 * 36
     xi = linspace(-1,1,N) + (random.rand(N) *2 - 1)/N
 
 
@@ -69,7 +69,7 @@ else:
     x = 11.99784076 * ones(N)
     y = 6.82321628 * ones(N) 
     z = 36.46795002 * ones(N)
-    r = 28.00 *ones(N) + xi * 1e-3
+    r = 28.00 *ones(N) + xi * 1e-0
 
     xyz = array([x, y, z], float).T
 
@@ -81,7 +81,7 @@ else:
             f2 = lorenz(xyz + 0.5 * f1, r) * dt
             f3 = lorenz(xyz + f2, r) * dt
             xyz += (f0 + f3) / 6 + (f1 + f2) / 3
-        if iFrame % 1 == 0: # output interval
+        if iFrame % 100 == 0: # output interval
             t1 = time.time()
             f = plot(iFrame, xyz[:,0] * 1.8, xyz[:,2], r)
             t2 = time.time()
