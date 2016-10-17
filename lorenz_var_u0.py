@@ -57,7 +57,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'shadowing':
         f.write_png()
 else:
     dt = 1. / 4 / 60
-    N = 500000 * 36
+    N = 500000 * 18
     xi = linspace(-1,1,N) + (random.rand(N) *2 - 1)/N
     # data used: time: 50.0 xyz:[ 11.99784076   6.82321628  36.46795002 ] 
     # tan: [ 0.09393647 -0.00105302  1.02519158 ]
@@ -81,6 +81,9 @@ else:
             f2 = lorenz(xyz + 0.5 * f1, r) * dt
             f3 = lorenz(xyz + f2, r) * dt
             xyz += (f0 + f3) / 6 + (f1 + f2) / 3
+        if comm.rank == 0:
+            print('{0}'.format(iFrame))
+            sys.stdout.flush()
         if iFrame % 100 == 0: # output interval
             t1 = time.time()
             f = plot(iFrame, xyz[:,0] * 1.8, xyz[:,2], r)
